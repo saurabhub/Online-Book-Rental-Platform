@@ -1,0 +1,169 @@
+const Product = require("../models/product");
+const slugify = require("slugify");
+const User = require("../models/user");
+
+const createProduct = async (req, res) => {
+  try {
+    // console.log(req.body)
+    req.body.slug = slugify(req.body.title);
+    const newProduct = await new Product(req.body).save();
+    res.json(newProduct);
+    console.log(newProduct);
+  } catch (error) {
+    console.log("Create Product Error: ", error);
+    // res.status(400).send("Create product failed");
+    res.status(400).json({
+      error: error.message,
+    });
+  }
+};
+
+const listProducts = async (req, res) => {
+  res.json(
+    await Product.find({})
+      .limit(parseInt(req.params.count))
+      .populate("category")
+      .populate("subs")
+      .populate("author")
+      .populate("publisher")
+      .sort([["createdAt", "desc"]])
+      .exec()
+  );
+};
+const removeProduct = async (req, res) => {
+  try {
+    const deletedProduct = await Product.findOneAndRemove({
+      slug: req.params.slug,
+    }).exec();
+    res.json(deletedProduct);
+  } catch (error) {
+    console.log("REMOVE PRODUCT ERR : ", error);
+    res.status(400).json({
+      error: error.message,
+    });
+  }
+};
+
+const readProduct = async (req, res) => {
+  const product = await Product.findOne({ slug: req.params.slug })
+    .populate("category")
+    .populate("subs")
+    .populate("author")
+    .populate("publisher")
+    .exec();
+  res.json(product);
+  // console.log("PRODUCT", product)
+};
+
+const updateProduct = async (req, res) => {
+  try {
+    if (req.body.title) {
+      req.body.slug = slugify(req.body.title);
+    }
+    const updatedProduct = await Product.findOneAndUpdate(
+      { slug: req.params.slug },
+      req.body,
+      { new: true }
+    ).exec();
+    res.json(updatedProduct);
+  } catch (error) {
+    console.log("UPDATE PRODUCT ERR : ", error);
+    res.status(400).json({
+      error: error.message,
+    });
+  }
+};
+
+const listProductsByCondition = async (req, res) => {
+  try {
+    const { sort, order, page } = req.body;
+    const currentPage = page || 1;
+    const perPage = 3;
+
+    res.json(
+      await Product.find({})
+        .skip((currentPage - 1) * perPage)
+        .limit(parseInt(perPage))
+        .populate("category")
+        .populate("subs")
+        .populate("author")
+        .populate("publisher")
+        .sort([[sort, order]])
+        .exec()
+    );
+  } catch (error) {
+    console.log("LIST PRODUCT BY CONDITION ERR : ", error);
+    res.status(400).json({
+      error: error.message,
+    });
+  }
+};
+
+const getProductsCount = async (req, res) => {
+  res.json(await Product.find({}).estimatedDocumentCount().exec());
+};
+
+const productRating = async (req, res) => {
+  const product = await Product.findById(req.params.productId).exec();
+  const user = await User.findOne({ email: req.user.email }).exec();
+  const { star } = req.body;
+// Check if user have left an rating already
+  let existingRatingObject = product.ratings.find(
+    (rating) => rating.postedBy.toString() === user._id.toString()
+  );
+// if not then ADD else UPDATE
+  if (existingRatingObject === undefined) {
+    let ratingAdded = await Product.findByIdAndUpdate(
+      product._id,
+      {
+        $push: { ratings: { star, postedBy: user._id } },
+      },
+      { new: true }
+    ).exec();
+    // console.log("rating ADDED:", ratingAdded);
+    res.json(ratingAdded);
+  } else {
+    const ratingUpdated = await Product.updateOne(
+      {
+        ratings: { $elemMatch: existingRatingObject },
+      },
+      {
+        $set: { "ratings.$.star": star },
+      },
+      { new: true }
+    ).exec();
+    // console.log("rating UPDATED:", ratingUpdated);
+    res.json(ratingUpdated);
+  }
+};
+
+const listRelatedProducts = async (req,res) => {
+  const product = await Product.findById(req.params.productId).exec()
+
+  const relatedProducts = await Product.find({
+    _id: {$ne: product._id},
+    category: product.category,
+  })
+  .limit(3)
+  .populate("category")
+  .populate("subs")
+  .populate("author")
+  .populate("publisher")
+  .populate("ratings.postedBy")
+  .exec()
+
+  res.json(relatedProducts)
+}
+
+
+module.exports = {
+  createProduct,
+  listProducts,
+  removeProduct,
+  readProduct,
+  updateProduct,
+  listProductsByCondition,
+  getProductsCount,
+  productRating,
+  listRelatedProducts,
+};
