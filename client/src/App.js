@@ -32,6 +32,8 @@ import CreatePublisher from "./pages/admin/publisher/CreatePublisher";
 import UpdatePublisher from "./pages/admin/publisher/UpdatePublisher";
 import Product from "./pages/Product";
 import ScrollToTop from "./components/routes/ScrollToTop";
+import CategoryHome from "./components/category/CategoryHome";
+import SubHome from "./components/sub/SubHome";
 
 function App() {
   const dispatch = useDispatch();
@@ -72,6 +74,8 @@ function App() {
           <Route path="/register/complete" element={<RegisterComplete />} />
           <Route path="/forgot/password" element={<ForgotPassword />} />
           <Route path="/product/:slug" element={<Product />} />
+          <Route path="/category/:slug" element={<CategoryHome />} />
+          <Route path="/sub/:slug" element={<SubHome />} />
 
           {/* User Routes  */}
           <Route

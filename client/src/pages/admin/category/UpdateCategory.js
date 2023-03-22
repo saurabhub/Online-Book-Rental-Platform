@@ -22,7 +22,7 @@ const UpdateCategory = () => {
   const loadCategory = () => {
     getCategory(slug)
       .then((res) => {
-        setName(res.data.name);
+        setName(res.data.category.name);
       })
       .catch((err) => {
         toast.error(err.message);

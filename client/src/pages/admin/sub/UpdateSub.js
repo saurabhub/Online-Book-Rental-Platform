@@ -27,8 +27,8 @@ const UpdateSub = () => {
   const loadCategory = () => {
     getSub(slug)
       .then((res) => {
-        setName(res.data.name);
-        setParentCategory(res.data.parentCategory)
+        setName(res.data.sub.name);
+        setParentCategory(res.data.sub.parentCategory)
       })
       .catch((err) => {
         toast.error(err.message);

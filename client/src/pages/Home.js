@@ -9,6 +9,8 @@ import Jumbotron from "../components/cards/Typewriter";
 import LoadingCard from "../components/cards/LoadingCard";
 import NewBooks from "../components/home/NewBooks";
 import BestSellers from "../components/home/BestSellers";
+import CategoryList from "../components/category/CategoryList";
+import SubList from "../components/sub/SubList";
 
 const Home = () => {
   return (
@@ -20,6 +22,8 @@ const Home = () => {
       </div>
       <NewBooks />
       <BestSellers />
+      <CategoryList />
+      <SubList />
     </>
   );
 };
