@@ -30,6 +30,7 @@ const listProducts = async (req, res) => {
       .exec()
   );
 };
+
 const removeProduct = async (req, res) => {
   try {
     const deletedProduct = await Product.findOneAndRemove({
@@ -107,11 +108,11 @@ const productRating = async (req, res) => {
   const product = await Product.findById(req.params.productId).exec();
   const user = await User.findOne({ email: req.user.email }).exec();
   const { star } = req.body;
-// Check if user have left an rating already
+  // Check if user have left an rating already
   let existingRatingObject = product.ratings.find(
     (rating) => rating.postedBy.toString() === user._id.toString()
   );
-// if not then ADD else UPDATE
+  // if not then ADD else UPDATE
   if (existingRatingObject === undefined) {
     let ratingAdded = await Product.findByIdAndUpdate(
       product._id,
@@ -137,24 +138,80 @@ const productRating = async (req, res) => {
   }
 };
 
-const listRelatedProducts = async (req,res) => {
-  const product = await Product.findById(req.params.productId).exec()
+const listRelatedProducts = async (req, res) => {
+  const product = await Product.findById(req.params.productId).exec();
 
   const relatedProducts = await Product.find({
-    _id: {$ne: product._id},
+    _id: { $ne: product._id },
     category: product.category,
   })
-  .limit(3)
-  .populate("category")
-  .populate("subs")
-  .populate("author")
-  .populate("publisher")
-  .populate("ratings.postedBy")
-  .exec()
+    .limit(3)
+    .populate("category")
+    .populate("subs")
+    .populate("author")
+    .populate("publisher")
+    .populate("ratings.postedBy")
+    .exec();
 
-  res.json(relatedProducts)
-}
+  res.json(relatedProducts);
+};
 
+const handleQuery = async (req, res, query) => {
+  const products = await Product.find({ $text: { $search: query } })
+    .populate("category", "_id name")
+    .populate("subs", "_id name")
+    .populate("ratings.postedBy", "_id name")
+    .exec();
+  res.json(products);
+};
+
+const handlePrice = async (req, res, price) => {
+  try {
+    let products = await Product.find({
+      price: {
+        $gte: price[0],
+        $lte: price[1],
+      },
+    })
+      .populate("category", "_id name")
+      .populate("subs", "_id name")
+      .populate("ratings.postedBy", "_id name")
+      .exec();
+    res.json(products);
+  } catch (error) {
+    console.log("HANDLE PRICE ERR: ", error);
+  }
+};
+
+const handleCategory = async (req, res, category) => {
+  try {
+    let products = await Product.find({ category })
+      .populate("category", "_id name")
+      .populate("subs", "_id name")
+      .populate("ratings.postedBy", "_id name")
+      .exec();
+    res.json(products);
+  } catch (error) {
+    console.log("HANDLE CATEGORY ERR: ", error);
+  }
+};
+
+const searchFilters = async (req, res) => {
+  const { query, price, category } = req.body;
+
+  if (query) {
+    // console.log("Query: ", query)
+    await handleQuery(req, res, query);
+  }
+
+  if (price !== undefined) {
+    await handlePrice(req, res, price);
+  }
+
+  if (category) {
+    await handleCategory(req, res, category);
+  }
+};
 
 module.exports = {
   createProduct,
@@ -166,4 +223,5 @@ module.exports = {
   getProductsCount,
   productRating,
   listRelatedProducts,
+  searchFilters,
 };

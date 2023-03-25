@@ -34,6 +34,7 @@ import Product from "./pages/Product";
 import ScrollToTop from "./components/routes/ScrollToTop";
 import CategoryHome from "./components/category/CategoryHome";
 import SubHome from "./components/sub/SubHome";
+import Shop from "./pages/Shop";
 
 function App() {
   const dispatch = useDispatch();
@@ -76,6 +77,7 @@ function App() {
           <Route path="/product/:slug" element={<Product />} />
           <Route path="/category/:slug" element={<CategoryHome />} />
           <Route path="/sub/:slug" element={<SubHome />} />
+          <Route path="/shop" element={<Shop />} />
 
           {/* User Routes  */}
           <Route

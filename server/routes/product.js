@@ -9,6 +9,7 @@ const {
   getProductsCount,
   productRating,
   listRelatedProducts,
+  searchFilters,
 } = require("../controllers/product");
 const router = express.Router();
 
@@ -19,6 +20,8 @@ router.route('/products/total').get(getProductsCount);
 router.route("/products/:count").get(listProducts);
 router.route('/products').post(listProductsByCondition);
 router.route("/product/related/:productId").get(listRelatedProducts);
+router.route("/search/filters").post(searchFilters);
+
 
 router.route('/product/rating/:productId').put(authCheck, productRating)
 

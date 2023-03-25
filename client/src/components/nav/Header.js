@@ -2,6 +2,7 @@ import {
   HomeOutlined,
   LogoutOutlined,
   SettingOutlined,
+  ShoppingOutlined,
   UserAddOutlined,
   UserOutlined,
 } from "@ant-design/icons";
@@ -14,6 +15,7 @@ import { auth } from "../../firebase";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { logout } from "../../features/auth/authSlice";
+import Search from "../forms/Search";
 
 const Header = () => {
   const dispatch = useDispatch();
@@ -28,7 +30,17 @@ const Header = () => {
       label: <Link to="/">Home</Link>,
       key: "/",
       icon: <HomeOutlined />,
+    },
+    {
+      label: <Link to="/shop">Shop</Link>,
+      key: "/shop",
+      icon: <ShoppingOutlined />,
       className: "me-auto",
+    },
+    {
+      label: (<Search />),
+      key: "/search/filters",
+      className: "d-flex"
     },
     user && {
       // label: user.email && (user.email.split('@')[0]),
@@ -97,7 +109,7 @@ const Header = () => {
       selectedKeys={[current]}
       mode="horizontal"
       items={items}
-      className="bg-dark bg-gradient"
+      className="bg-dark bg-gradient d-flex align-items-center"
     />
   );
 };
