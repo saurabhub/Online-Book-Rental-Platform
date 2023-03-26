@@ -196,8 +196,75 @@ const handleCategory = async (req, res, category) => {
   }
 };
 
+const handleStar = (req, res, stars) => {
+  Product.aggregate([
+    {
+      $project: {
+        document: "$$ROOT",
+        floorAverage: {
+          $floor: { $avg: "$ratings.star" },
+        },
+      },
+    },
+    {
+      $match: { floorAverage: stars },
+    },
+  ])
+    .limit(12)
+    .exec((err, aggregates) => {
+      if (err) console.log("AGGREGATE ERROR: ", err);
+      Product.find({ _id: aggregates })
+        .populate("category", "_id name")
+        .populate("subs", "_id name")
+        .populate("ratings.postedBy", "_id name")
+        .exec((err, products) => {
+          if (err) console.log("PRODUCT AGGREGATE ERROR: ", err);
+          res.json(products);
+        });
+    });
+};
+
+const handleSub = async (req, res, sub) => {
+  try {
+    let products = await Product.find({ subs: sub })
+      .populate("category", "_id name")
+      .populate("subs", "_id name")
+      .populate("ratings.postedBy", "_id name")
+      .exec();
+    res.json(products);
+  } catch (error) {
+    console.log("HANDLE SUB ERR: ", error);
+  }
+};
+const handlePublisher = async (req, res, publisher) => {
+  try {
+    let products = await Product.find({ publisher })
+      .populate("category", "_id name")
+      .populate("subs", "_id name")
+      .populate("publisher", "_id name")
+      .populate("ratings.postedBy", "_id name")
+      .exec();
+    res.json(products);
+  } catch (error) {
+    console.log("HANDLE PUBLISHER ERR: ", error);
+  }
+};
+const handleAuthor = async (req, res, author) => {
+  try {
+    let products = await Product.find({ author })
+      .populate("category", "_id name")
+      .populate("subs", "_id name")
+      .populate("author", "_id name")
+      .populate("ratings.postedBy", "_id name")
+      .exec();
+    res.json(products);
+  } catch (error) {
+    console.log("HANDLE AUTHOR ERR: ", error);
+  }
+};
+
 const searchFilters = async (req, res) => {
-  const { query, price, category } = req.body;
+  const { query, price, category, stars, sub, author, publisher } = req.body;
 
   if (query) {
     // console.log("Query: ", query)
@@ -210,6 +277,20 @@ const searchFilters = async (req, res) => {
 
   if (category) {
     await handleCategory(req, res, category);
+  }
+
+  if (stars) {
+    await handleStar(req, res, stars);
+  }
+
+  if(sub){
+    await handleSub(req, res, sub)
+  }
+  if(publisher){
+    await handlePublisher(req, res, publisher)
+  }
+  if(author){
+    await handleAuthor(req, res, author)
   }
 };
 

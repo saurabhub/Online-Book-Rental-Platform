@@ -1,7 +1,7 @@
 import { Checkbox, Menu, Slider } from "antd";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Col, Container, Row } from "reactstrap";
+import { Badge, Col, Container, Row } from "reactstrap";
 import HomeProductCard from "../components/cards/HomeProductCard";
 import {
   fetchProductsByFilter,
@@ -10,6 +10,10 @@ import {
 import { DollarOutlined, DownSquareOutlined } from "@ant-design/icons";
 import { searchQuery } from "../features/search/searchSlice";
 import { getAllCategory } from "../functions/category";
+import StarFilter from "../components/forms/StarFilter";
+import { getAllSub } from "../functions/sub";
+import { getAllAuthor } from "../functions/author";
+import { getAllPublisher } from "../functions/publisher";
 
 const Shop = () => {
   const [products, setProducts] = useState([]);
@@ -21,10 +25,20 @@ const Shop = () => {
   const [ok, setOk] = useState(false);
   const [categories, setCategories] = useState([]);
   const [checkedCategoryIds, setCheckedCategoryIds] = useState([]);
+  const [star, setStar] = useState("");
+  const [subs, setSubs] = useState([]);
+  const [sub, setSub] = useState("");
+  const [authors, setAuthors] = useState([]);
+  const [author, setAuthor] = useState("");
+  const [publishers, setPublishers] = useState([]);
+  const [publisher, setPublisher] = useState("");
 
   useEffect(() => {
     loadAllProducts();
     getAllCategory().then((res) => setCategories(res.data));
+    getAllSub().then((res) => setSubs(res.data));
+    getAllAuthor().then((res) => setAuthors(res.data));
+    getAllPublisher().then((res) => setPublishers(res.data));
   }, []);
 
   useEffect(() => {
@@ -54,8 +68,12 @@ const Shop = () => {
 
   const handleSlider = (value) => {
     dispatch(searchQuery({ text: "" }));
-    setCheckedCategoryIds([])
+    setCheckedCategoryIds([]);
     setPrice(value);
+    setStar("");
+    setSub("");
+    setAuthor("");
+    setPublisher("");
     setTimeout(() => {
       setOk(!ok);
     }, 300);
@@ -63,7 +81,11 @@ const Shop = () => {
 
   const handleCheck = (e) => {
     dispatch(searchQuery({ text: "" }));
-    setPrice([0,0])
+    setPrice([0, 0]);
+    setStar("");
+    setSub("");
+    setAuthor("");
+    setPublisher("");
     let inTheState = [...checkedCategoryIds];
     let justChecked = e.target.value;
     let foundInTheState = inTheState.indexOf(justChecked);
@@ -74,7 +96,7 @@ const Shop = () => {
       inTheState.splice(foundInTheState, 1);
     }
     setCheckedCategoryIds(inTheState);
-    fetchProducts({category: inTheState})
+    fetchProducts({ category: inTheState });
   };
   // console.log("category ids", checkedCategoryIds);
 
@@ -95,6 +117,98 @@ const Shop = () => {
       className: "ps-4",
     }));
 
+  const handleStarClick = (num) => {
+    // console.log(num)
+    dispatch(searchQuery({ text: "" }));
+    setPrice([0, 0]);
+    setCheckedCategoryIds([]);
+    setSub("");
+    setAuthor("");
+    setPublisher("");
+    setStar(num);
+    fetchProducts({ stars: num });
+  };
+
+  const showStars = () => {
+    let stars = [];
+    for (let i = 5; i > 0; i--) {
+      stars.push({
+        label: <StarFilter starClick={handleStarClick} numberOfStars={i} />,
+        key: `${i}star`,
+        className: "ps-4 px-0 ms-0 me-0",
+      });
+    }
+    return stars;
+  };
+
+  const handleSub = (sub) => {
+    setSub(sub);
+    dispatch(searchQuery({ text: "" }));
+    setPrice([0, 0]);
+    setCheckedCategoryIds([]);
+    setStar("");
+    setAuthor("");
+    setPublisher("");
+    fetchProducts({ sub });
+  };
+  const handleAuthor = (author) => {
+    setAuthor(author);
+    dispatch(searchQuery({ text: "" }));
+    setPrice([0, 0]);
+    setCheckedCategoryIds([]);
+    setStar("");
+    setPublisher("");
+    fetchProducts({ author });
+  };
+  const handlePublisher = (publisher) => {
+    setPublisher(publisher);
+    dispatch(searchQuery({ text: "" }));
+    setPrice([0, 0]);
+    setCheckedCategoryIds([]);
+    setStar("");
+    setAuthor("");
+    fetchProducts({ publisher });
+  };
+
+  const showSubs = () =>
+    subs.map((sub) => ({
+      label: (
+        <Badge key={sub._id} onClick={() => handleSub(sub)} color="dark">
+          {sub.name}
+        </Badge>
+      ),
+      key: sub._id,
+      className: "p-0 px-1 m-0 w-auto h-auto d-inline-block",
+    }));
+  const showAuthor = () =>
+    authors.map((author) => ({
+      label: (
+        <Badge
+          key={author._id}
+          onClick={() => handleAuthor(author)}
+          color="dark"
+        >
+          {author.name}
+        </Badge>
+      ),
+      key: author._id,
+      className: "p-0 px-1 m-0 w-auto h-auto d-inline-block",
+    }));
+  const showPublisher = () =>
+    publishers.map((publisher) => ({
+      label: (
+        <Badge
+          key={publisher._id}
+          onClick={() => handlePublisher(publisher)}
+          color="dark"
+        >
+          {publisher.name}
+        </Badge>
+      ),
+      key: publisher._id,
+      className: "p-0 px-1 m-0 w-auto h-auto d-inline-block",
+    }));
+
   const items = [
     {
       label: "Price",
@@ -113,7 +227,7 @@ const Shop = () => {
               />
             </div>
           ),
-          key: "1",
+          key: "slider",
           className: "px-3",
         },
       ],
@@ -124,10 +238,41 @@ const Shop = () => {
       icon: <DownSquareOutlined />,
       children: showCategories(),
     },
+    {
+      label: "Rating",
+      key: "rating",
+      icon: <DownSquareOutlined />,
+      children: showStars(),
+    },
+    {
+      label: "Sub Categories",
+      key: "subs",
+      icon: <DownSquareOutlined />,
+      children: showSubs(),
+    },
+    {
+      label: "Author",
+      key: "author",
+      icon: <DownSquareOutlined />,
+      children: showAuthor(),
+    },
+    {
+      label: "Publisher",
+      key: "publisher",
+      icon: <DownSquareOutlined />,
+      children: showPublisher(),
+    },
   ];
 
   // submenu keys of first level
-  const rootSubmenuKeys = ["price", "category"];
+  const rootSubmenuKeys = [
+    "price",
+    "category",
+    "rating",
+    "subs",
+    "author",
+    "publisher",
+  ];
   const [openKeys, setOpenKeys] = useState(["price"]);
   const onOpenChange = (keys) => {
     const latestOpenKey = keys.find((key) => openKeys.indexOf(key) === -1);
@@ -168,7 +313,7 @@ const Shop = () => {
                 </h4>
               )}
             </div>
-            {products.length < 1 && <p>No product found with that keyword</p>}
+            {products.length < 1 && <p>No product found with that filter!</p>}
             <Row className="p-0 mx-3 mt-4">
               {products.map((product) => (
                 <Col key={product._id} xs="12" sm="6" lg="4" className="mb-4">
