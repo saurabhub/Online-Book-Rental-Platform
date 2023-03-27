@@ -7,7 +7,7 @@ import {
   fetchProductsByFilter,
   getAllProductsByCount,
 } from "../functions/product";
-import { DollarOutlined, DownSquareOutlined } from "@ant-design/icons";
+import { BookOutlined, DollarOutlined, DownSquareOutlined, ReadOutlined, StarOutlined, TagOutlined } from "@ant-design/icons";
 import { searchQuery } from "../features/search/searchSlice";
 import { getAllCategory } from "../functions/category";
 import StarFilter from "../components/forms/StarFilter";
@@ -241,25 +241,25 @@ const Shop = () => {
     {
       label: "Rating",
       key: "rating",
-      icon: <DownSquareOutlined />,
+      icon: <StarOutlined />,
       children: showStars(),
     },
     {
       label: "Sub Categories",
       key: "subs",
-      icon: <DownSquareOutlined />,
+      icon: <TagOutlined />,
       children: showSubs(),
     },
     {
       label: "Author",
       key: "author",
-      icon: <DownSquareOutlined />,
+      icon: <BookOutlined />,
       children: showAuthor(),
     },
     {
       label: "Publisher",
       key: "publisher",
-      icon: <DownSquareOutlined />,
+      icon: <ReadOutlined  />,
       children: showPublisher(),
     },
   ];

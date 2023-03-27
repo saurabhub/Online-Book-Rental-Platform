@@ -35,6 +35,8 @@ import ScrollToTop from "./components/routes/ScrollToTop";
 import CategoryHome from "./components/category/CategoryHome";
 import SubHome from "./components/sub/SubHome";
 import Shop from "./pages/Shop";
+import Cart from "./pages/Cart";
+import SideDrawer from "./components/drawer/SideDrawer";
 
 function App() {
   const dispatch = useDispatch();
@@ -67,6 +69,7 @@ function App() {
     <Router>
       <ScrollToTop>
         <ToastContainer />
+        <SideDrawer />
         <Header />
         <Routes>
           <Route path="/" element={<Home />} />
@@ -78,6 +81,7 @@ function App() {
           <Route path="/category/:slug" element={<CategoryHome />} />
           <Route path="/sub/:slug" element={<SubHome />} />
           <Route path="/shop" element={<Shop />} />
+          <Route path="/cart" element={<Cart />} />
 
           {/* User Routes  */}
           <Route

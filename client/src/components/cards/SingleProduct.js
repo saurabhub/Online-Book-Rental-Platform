@@ -1,6 +1,6 @@
-import { HeartOutlined, ShoppingOutlined } from "@ant-design/icons";
-import { Card, Tabs } from "antd";
-import React from "react";
+import { HeartOutlined, ShoppingCartOutlined, ShoppingOutlined } from "@ant-design/icons";
+import { Card, Tabs, Tooltip } from "antd";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Col, Row } from "reactstrap";
 import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a loader
@@ -9,9 +9,15 @@ import ProductListItem from "./ProductListItem";
 import StarRatings from "react-star-ratings";
 import RatingModal from "../modals/RatingModal";
 import { showAverage } from "../../functions/rating";
+import _ from "lodash";
+import { useDispatch, useSelector } from "react-redux";
+import { addToCart } from "../../features/cart/cartSlice";
 
 const SingleProduct = ({ product, onStarClick, star }) => {
   const { title, description, images, _id } = product;
+  const [tooltip, setTooltip] = useState("Click to add");
+  const { cart } = useSelector((state) => ({ ...state }));
+  const dispatch = useDispatch();
 
   const items = [
     {
@@ -26,19 +32,51 @@ const SingleProduct = ({ product, onStarClick, star }) => {
     // },
   ];
 
+  const handleAddToCart = () => {
+    setTooltip("Added");
+    let cart = [];
+    if (typeof window !== "undefined") {
+      if (localStorage.getItem("cart")) {
+        cart = JSON.parse(localStorage.getItem("cart"));
+      }
+
+      cart.push({ ...product, count: 1 });
+      // console.log(_.uniqWith(cart, _.isEqual))
+      // console.log("cart without applying unique: ", cart)
+
+      let unique = _.uniqWith(cart, _.isEqual);
+      const itemone = cart[0]
+      const itemtwo = cart[1]
+      const itemthree = cart[2]
+      // console.log("one: ", itemone)
+      // console.log("two:   ", itemtwo)
+      // console.log("three: ", itemthree)
+      // console.log("difference: ", _.differenceWith(cart, _.isEqual))
+      // console.log("comparing first and second cart items", _.isEqual(itemone, itemtwo))
+      // console.log("comparing second and third cart items", _.isEqual(itemtwo, itemthree))
+      console.log("unique", unique)
+      // console.log("is unique and cart equal", JSON.stringify(unique) === JSON.stringify(cart))
+      // console.log(unique)
+
+      localStorage.setItem("cart", JSON.stringify(unique));
+      dispatch(addToCart(unique));
+    }
+  };
+
   return (
     <>
       <Row className="m-0">
         <Col xs="7">
           {images && images.length && (
             <Carousel showArrows={true} autoPlay infiniteLoop>
-              {images && images.map((image) => (
-                <img
-                  key={image.public_id}
-                  src={image.url}
-                  className="border-bottom border-secondary py-2"
-                />
-              ))}
+              {images &&
+                images.map((image) => (
+                  <img
+                    key={image.public_id}
+                    src={image.url}
+                    className="border-bottom border-secondary py-2"
+                  />
+                ))}
             </Carousel>
           )}
         </Col>
@@ -52,10 +90,12 @@ const SingleProduct = ({ product, onStarClick, star }) => {
           <Card
             hoverable
             actions={[
-              <Link className="text-primary">
-                <ShoppingOutlined />
-                <br /> Add to Cart
-              </Link>,
+              <Tooltip title={tooltip}>
+                <a onClick={handleAddToCart} className="text-success">
+                  <ShoppingCartOutlined />
+                  <br /> Add to Cart
+                </a>
+              </Tooltip>,
               <Link className="text-danger">
                 <HeartOutlined />
                 <br /> Add to Wishlist

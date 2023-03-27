@@ -36,14 +36,19 @@ const Login = () => {
   const { user } = useSelector((state) => ({ ...state }));
 
   useEffect(() => {
-    if (user && user.token) {
-      navigate("/");
+    if (location.state?.from) {
+      return;
+    } else {
+      if (user && user.token) {
+        navigate("/");
+      }
     }
   }, [user, navigate]);
 
   const roleBasedRedirect = (res) => {
     toast.success("login successful");
 
+    // console.log(location.state?.from)
     if (location.state?.from) {
       navigate(location.state.from);
     } else {
@@ -53,7 +58,7 @@ const Login = () => {
         navigate("/user/history");
       }
     }
-    console.log(res.data.role);
+    // console.log(res.data.role);
   };
 
   const handleLogin = () => {

@@ -1,12 +1,40 @@
-import React from "react";
+import React, { useState } from "react";
 import { EyeOutlined, ShoppingCartOutlined } from "@ant-design/icons";
 import { Link } from "react-router-dom";
-import { Card } from "antd";
+import { Card, Tooltip } from "antd";
 import Meta from "antd/es/card/Meta";
 import { showAverage } from "../../functions/rating";
+import _ from "lodash";
+import {useDispatch, useSelector} from "react-redux"
+import { addToCart } from "../../features/cart/cartSlice";
+import { setVisible } from "../../features/cart/drawerSlice";
 
 const HomeProductCard = ({ product }) => {
   const { title, description, images, slug, price } = product;
+  const [tooltip, setTooltip] = useState("Click to add");
+  const {cart} = useSelector((state)=>({...state}))
+  const dispatch = useDispatch()
+
+  const handleAddToCart = () => {
+    setTooltip("Added");
+    let cart = [];
+    if (typeof window !== "undefined") {
+      if (localStorage.getItem("cart")) {
+        cart = JSON.parse(localStorage.getItem("cart"));
+      }
+
+      cart.push({ ...product, count: 1 });
+
+      let unique = _.uniqWith(cart, _.isEqual);
+      // console.log("card unique: ", unique)
+
+      localStorage.setItem("cart", JSON.stringify(unique));
+
+      dispatch(addToCart(unique))
+      dispatch(setVisible(true))
+    }
+  };
+
   return (
     <>
       {product && product.ratings && product.ratings.length > 0 ? (
@@ -29,10 +57,12 @@ const HomeProductCard = ({ product }) => {
             <EyeOutlined />
             <br /> View Product
           </Link>,
-          <div className="text-success">
-            <ShoppingCartOutlined />
-            <br /> Add to Cart
-          </div>,
+          <Tooltip title={tooltip}>
+            <a onClick={handleAddToCart} className="text-success">
+              <ShoppingCartOutlined />
+              <br /> Add to Cart
+            </a>
+          </Tooltip>,
         ]}
       >
         <Meta

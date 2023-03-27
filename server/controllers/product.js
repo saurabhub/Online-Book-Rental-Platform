@@ -150,7 +150,7 @@ const listRelatedProducts = async (req, res) => {
     .populate("subs")
     .populate("author")
     .populate("publisher")
-    .populate("ratings.postedBy")
+    .populate("ratings")
     .exec();
 
   res.json(relatedProducts);

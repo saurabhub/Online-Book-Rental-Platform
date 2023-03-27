@@ -2,11 +2,12 @@ import {
   HomeOutlined,
   LogoutOutlined,
   SettingOutlined,
+  ShoppingCartOutlined,
   ShoppingOutlined,
   UserAddOutlined,
   UserOutlined,
 } from "@ant-design/icons";
-import { Menu } from "antd";
+import { Badge, Menu } from "antd";
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -21,7 +22,7 @@ const Header = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   let location = useLocation();
-  const { user } = useSelector((state) => ({ ...state }));
+  const { user, cart } = useSelector((state) => ({ ...state }));
 
   const [current, setCurrent] = useState(location.pathname);
 
@@ -35,12 +36,28 @@ const Header = () => {
       label: <Link to="/shop">Shop</Link>,
       key: "/shop",
       icon: <ShoppingOutlined />,
+    },
+    {
+      label: (
+        <Link to="/cart">
+          <Badge
+            size="small"
+            count={cart.length}
+            offset={[5, -2]}
+            className="text-white"
+          >
+            Cart
+          </Badge>
+        </Link>
+      ),
+      key: "/cart",
+      icon: <ShoppingCartOutlined />,
       className: "me-auto",
     },
     {
-      label: (<Search />),
+      label: <Search />,
       key: "/search/filters",
-      className: "d-flex"
+      className: "d-flex",
     },
     user && {
       // label: user.email && (user.email.split('@')[0]),
@@ -55,11 +72,10 @@ const Header = () => {
             ) : (
               <Link to="/user/history">Dashboard</Link>
             ),
-          key: user && user.role === "admin" ? (
-            "/admin/dashboard"
-          ) : (
-            "/user/history"
-          ),
+          key:
+            user && user.role === "admin"
+              ? "/admin/dashboard"
+              : "/user/history",
         },
         {
           label: "Logout",
@@ -104,7 +120,7 @@ const Header = () => {
 
   return (
     <Menu
-    theme="dark"
+      theme="dark"
       onClick={onClick}
       selectedKeys={[current]}
       mode="horizontal"
