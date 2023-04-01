@@ -10,7 +10,7 @@ import { addToCart } from "../../features/cart/cartSlice";
 import { setVisible } from "../../features/cart/drawerSlice";
 
 const HomeProductCard = ({ product }) => {
-  const { title, description, images, slug, price } = product;
+  const { title, description, images, slug, price, quantity } = product;
   const [tooltip, setTooltip] = useState("Click to add");
   const {cart} = useSelector((state)=>({...state}))
   const dispatch = useDispatch()
@@ -57,10 +57,10 @@ const HomeProductCard = ({ product }) => {
             <EyeOutlined />
             <br /> View Product
           </Link>,
-          <Tooltip title={tooltip}>
-            <a onClick={handleAddToCart} className="text-success">
+          <Tooltip title={quantity >= 1 && tooltip}>
+            <a onClick={quantity >= 1 && handleAddToCart} className="text-success" disabled={quantity < 1}>
               <ShoppingCartOutlined />
-              <br /> Add to Cart
+              <br /> {quantity < 1 ? <span className="text-danger">Out of Stock</span>: "Add to Cart"}
             </a>
           </Tooltip>,
         ]}

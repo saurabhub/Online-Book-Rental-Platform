@@ -36,12 +36,13 @@ const UserNav = () => {
     <Menu
       mode="inline"
       theme='dark'
-      style={{
-        width: 256,
-      }}
+      // style={{
+      //   width: 256,
+      // }}
       onClick={onClick}
       selectedKeys={[current]}
       items={items}
+      className="bg-dark bg-gradient"
     />
   );
 };

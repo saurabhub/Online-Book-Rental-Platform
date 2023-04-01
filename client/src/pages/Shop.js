@@ -44,6 +44,8 @@ const Shop = () => {
   useEffect(() => {
     const delayed = setTimeout(() => {
       fetchProducts({ query: text });
+      if(!text)
+        loadAllProducts()
     }, 300);
 
     return () => clearTimeout(delayed);
@@ -97,6 +99,9 @@ const Shop = () => {
     }
     setCheckedCategoryIds(inTheState);
     fetchProducts({ category: inTheState });
+    if(inTheState == ""){
+      loadAllProducts()
+    }
   };
   // console.log("category ids", checkedCategoryIds);
 

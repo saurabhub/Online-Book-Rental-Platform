@@ -37,6 +37,9 @@ import SubHome from "./components/sub/SubHome";
 import Shop from "./pages/Shop";
 import Cart from "./pages/Cart";
 import SideDrawer from "./components/drawer/SideDrawer";
+import Checkout from "./pages/Checkout";
+import CreateCoupon from "./pages/admin/coupon/CreateCoupon";
+import Payment from "./pages/Payment";
 
 function App() {
   const dispatch = useDispatch();
@@ -105,6 +108,22 @@ function App() {
             element={
               <ProtectedUserRoute>
                 <Wishlist />
+              </ProtectedUserRoute>
+            }
+          />
+          <Route
+            path="/checkout"
+            element={
+              <ProtectedUserRoute>
+                <Checkout />
+              </ProtectedUserRoute>
+            }
+          />
+          <Route
+            path="/payment"
+            element={
+              <ProtectedUserRoute>
+                <Payment />
               </ProtectedUserRoute>
             }
           />
@@ -203,6 +222,14 @@ function App() {
             element={
               <ProtectedAdminRoute>
                 <ProductUpdate />
+              </ProtectedAdminRoute>
+            }
+          />
+          <Route
+            path="/admin/coupon"
+            element={
+              <ProtectedAdminRoute>
+                <CreateCoupon />
               </ProtectedAdminRoute>
             }
           />

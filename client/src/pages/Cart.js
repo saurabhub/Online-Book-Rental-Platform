@@ -3,6 +3,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button, Col, Container, Row, Table } from "reactstrap";
 import ProductCardInCheckout from "../components/cards/ProductCardInCheckout";
+import { COD } from "../features/cart/CODSlice";
+import { userCart } from "../functions/user";
 
 const Cart = () => {
   const { user, cart } = useSelector((state) => ({ ...state }));
@@ -19,6 +21,31 @@ const Cart = () => {
   const handleLoginToCheckout = (e) => {
     e.preventDefault();
     navigate("/login", { state: { from: location } });
+  };
+
+  const saveOrderToDB = () => {
+    // alert("Saving order to DB.");
+    userCart(cart, user.token)
+      .then((res) => {
+        // console.log("user cart res::", res);
+        if (res.data.ok) navigate("/checkout");
+      })
+      .catch((error) => {
+        console.log("Cart Save ERROR", error);
+      });
+  };
+
+  const saveCashOrderToDB = () => {
+    // alert("Saving order to DB.");
+    dispatch(COD(true))
+    userCart(cart, user.token)
+      .then((res) => {
+        // console.log("user cart res::", res);
+        if (res.data.ok) navigate("/checkout");
+      })
+      .catch((error) => {
+        console.log("Cart Save ERROR", error);
+      });
   };
 
   return (
@@ -74,13 +101,25 @@ const Cart = () => {
             Total: <b>₹{getTotal()}</b>
             <hr />
             {user ? (
+              <>
               <Button
                 color="primary"
                 className="d-flex align-items-center justify-content-center gap-2"
                 disabled={!cart.length}
+                onClick={saveOrderToDB}
               >
                 <span>Proceed to Checkout</span>
               </Button>
+              <hr />
+              <Button
+                color="warning"
+                className="d-flex align-items-center justify-content-center gap-2"
+                disabled={!cart.length}
+                onClick={saveCashOrderToDB}
+              >
+                <span>Pay Cash On Delivery</span>
+              </Button>
+              </>
             ) : (
               <Button
                 color="primary"

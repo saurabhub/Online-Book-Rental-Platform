@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const drawerSlice = createSlice({
-  name: "cart",
+  name: "drawer",
   initialState: false,
   reducers: {
     setVisible: (state, action) => {

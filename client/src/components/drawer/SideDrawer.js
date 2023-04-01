@@ -2,7 +2,15 @@ import { Drawer } from "antd";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import drawerSlice, { setVisible } from "../../features/cart/drawerSlice";
-import { Row, Col, Card, CardBody, CardTitle, CardText, Button } from "reactstrap";
+import {
+  Row,
+  Col,
+  Card,
+  CardBody,
+  CardTitle,
+  CardText,
+  Button,
+} from "reactstrap";
 import { Link } from "react-router-dom";
 
 const SideDrawer = () => {
@@ -11,7 +19,7 @@ const SideDrawer = () => {
 
   const imageStyle = {
     // width: "100%",
-    height: "90px",
+    // height: "90px",
     objectFit: "contain",
   };
 
@@ -31,7 +39,7 @@ const SideDrawer = () => {
               <>
                 <Card className="mb-3" style={{ maxWidth: "540px" }}>
                   <Row className="g-0">
-                    <Col md="4">
+                    <Col md="2">
                       <img
                         src={item.images[0].url}
                         alt={item.title}
@@ -39,8 +47,8 @@ const SideDrawer = () => {
                         className="img-fluid rounded-start"
                       />
                     </Col>
-                    <Col md="8">
-                      <CardBody>
+                    <Col md="10" className="my-auto">
+                      <CardBody className="py-0">
                         <CardTitle tag="h6">{item.title}</CardTitle>
                         <CardText>Quantity: {item.count}</CardText>
                       </CardBody>
@@ -70,8 +78,8 @@ const SideDrawer = () => {
         <Button
           color="primary"
           className="d-flex ms-auto align-items-center justify-content-center gap-2"
-          onClick={()=>{
-            dispatch(setVisible(false))
+          onClick={() => {
+            dispatch(setVisible(false));
           }}
         >
           Go to Cart

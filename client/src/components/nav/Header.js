@@ -126,6 +126,8 @@ const Header = () => {
       mode="horizontal"
       items={items}
       className="bg-dark bg-gradient d-flex align-items-center"
+      // onKeyDown={(e)=>{e.preventDefault()}}
+      // tabIndex="0"
     />
   );
 };

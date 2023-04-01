@@ -1,7 +1,7 @@
 import { HeartOutlined, ShoppingCartOutlined, ShoppingOutlined } from "@ant-design/icons";
 import { Card, Tabs, Tooltip } from "antd";
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Col, Row } from "reactstrap";
 import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a loader
 import { Carousel } from "react-responsive-carousel";
@@ -12,12 +12,15 @@ import { showAverage } from "../../functions/rating";
 import _ from "lodash";
 import { useDispatch, useSelector } from "react-redux";
 import { addToCart } from "../../features/cart/cartSlice";
+import { addToWishlist } from "../../functions/user";
+import { toast } from "react-toastify";
 
 const SingleProduct = ({ product, onStarClick, star }) => {
   const { title, description, images, _id } = product;
   const [tooltip, setTooltip] = useState("Click to add");
-  const { cart } = useSelector((state) => ({ ...state }));
+  const { user, cart } = useSelector((state) => ({ ...state }));
   const dispatch = useDispatch();
+  const navigate = useNavigate()
 
   const items = [
     {
@@ -63,6 +66,15 @@ const SingleProduct = ({ product, onStarClick, star }) => {
     }
   };
 
+  const handleAddToWishlist = (e) => {
+    e.preventDefault()
+    addToWishlist(product._id, user.token).then(res=>{
+      console.log("added to wishlist", res.data)
+      toast.success("Added to wishlist")
+      navigate("/user/wishlist")
+    })
+  }
+
   return (
     <>
       <Row className="m-0">
@@ -96,10 +108,10 @@ const SingleProduct = ({ product, onStarClick, star }) => {
                   <br /> Add to Cart
                 </a>
               </Tooltip>,
-              <Link className="text-danger">
+                <a onClick={handleAddToWishlist} className="text-danger">
                 <HeartOutlined />
                 <br /> Add to Wishlist
-              </Link>,
+                </a>,
               <RatingModal>
                 <StarRatings
                   rating={star}
